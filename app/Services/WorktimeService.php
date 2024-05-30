@@ -30,4 +30,35 @@ class WorktimeService
 
         return null;
     }
+
+    public function hoursCalculation($worktime){
+        $hours = 0;
+        foreach($worktime as $time){
+            $startTime = Carbon::parse($time->data_rozpoczecia);
+            $endTime = Carbon::parse($time->data_zakonczenia);
+
+            $differenceTime = $startTime->diffInMinutes($endTime) / 60;
+            $differenceTime = $this->roundToNearestHalfHour($differenceTime);
+
+            $hours += $differenceTime;
+        }
+    }
+
+    private function roundToNearestHalfHour($time){
+        $hours = floor($time);
+        $minutes = ($time - $hours) * 60;
+
+        if($minutes < 15){
+            $roundedMinutes = 0;
+        }
+        elseif($minutes >= 15 && $minutes < 45){
+            $roundedMinutes = 30;
+        }
+        else{
+            $roundedMinutes = 0;
+            $hours += 1;
+        }
+
+        return $hours + ($roundedMinutes / 60);
+    }
 }

@@ -76,5 +76,7 @@ class WorktimeController extends Controller
         if ($worktime->isEmpty()) {
             return response()->json(['error' => 'Brak danych o czasie pracy dla podanej daty'], 404);
         }
+
+        $hours = $this->worktimeService->hoursCalculation($worktime);
     }
 }
