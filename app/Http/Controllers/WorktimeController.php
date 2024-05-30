@@ -54,4 +54,27 @@ class WorktimeController extends Controller
             return response()->json(['error' => 'Wystąpił błąd podczas dodawania czasu pracy'], 500);
         }
     }
+
+    public function summary(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'uuid' => 'required|string|exists:employees,uuid',
+            'date' => 'required|string',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $employee = Employee::where('uuid', $request->uuid)->first();
+
+        $date = $request->date;
+        $worktime = Worktime::where('employee_id', $employee->id)
+                    ->where('dzien_rozpoczecia', 'like', $date . '%')
+                    ->get();
+
+        if ($worktime->isEmpty()) {
+            return response()->json(['error' => 'Brak danych o czasie pracy dla podanej daty'], 404);
+        }
+    }
 }
