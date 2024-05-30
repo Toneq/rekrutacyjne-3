@@ -61,13 +61,14 @@ class WorktimeService
             $hours += 1;
         }
     
-        if ($hours > 8) {
-            $overtime = $hours - 8;
+        $totalHours = $hours + ($roundedMinutes / 60);
+    
+        if ($totalHours > 8) {
+            $overtime = $totalHours - 8;
             $hours = 8;
-            $overtime += $roundedMinutes / 60;
             return ['hours' => $hours, 'overtime' => $overtime];
         }
     
-        return ['hours' => $hours + ($roundedMinutes / 60), 'overtime' => 0];
+        return ['hours' => $totalHours, 'overtime' => 0];
     }
 }
