@@ -77,6 +77,32 @@ class WorktimeController extends Controller
             return response()->json(['error' => 'Brak danych o czasie pracy dla podanej daty'], 404);
         }
 
-        $hours = $this->worktimeService->hoursCalculation($worktime);
+        // $hours = $this->worktimeService->hoursCalculation($worktime);
+        $response = $this->worktimeService->hoursCalculation($worktime);
+
+        //dla mnie ogólnie coś jest nie tak poniewaz w zadaniu jest powiedziane 40h miesięcznie co wydaje mi się złą wartością (może chodziło o normę w tygodniu?)
+        //przez co źle oblicza normy ponieważ dopóki nie przebije 40h to jest to źle liczone. Chyba, że ja źle zrozumiałem.
+        //Zrobiłem tak że oblicza max 8 jako normę i resztę jako nadgodziny - jeżeli źle zrozumiałem to przepraszam
+        $overtimeRate = $this->hourlyRate * ($this->overtimeRatePercent/100);
+        // $hoursStandard = min($hours, $this->normMonthlyHours); //zwraca normę miesięczną a jeżeli nie to pokazuje ile jest przepracowanych - obliczenia na 40h miesiecznie
+        // $hoursOvertime = max($hours - $this->normMonthlyHours, 0); //zwraca ilość nadgodzin od normy miesięcznej - obliczenia na 40h miesiecznie
+
+        $hoursStandard = $response["hours"];
+        $hoursOvertime = $response["overtime"];
+        $valueStandard = $hoursStandard * $this->hourlyRate; //obliczanie ile trzeba zapłacić za wypracowanie normy miesięcznej
+        $valueOvertime = $hoursOvertime * $overtimeRate; //obliczenie ile trzeba zapłacić za nagodziny wypracowane ponad normę miesięczną
+        $valueWorkedHours = $valueStandard + $valueOvertime; //suma obu obliczeń które pokazują ile trzeba zapłacić pracownikowi za wypracowanie godzin
+        $hours = $hoursStandard + $hoursOvertime;
+
+        return response()->json([
+            'uuid' => $employee->uuid,
+            'okres' => $date,
+            'przepracowane_godziny_ogólnie' => $hours,
+            'wartosc_wypracowanych_godzin_ogolnie' => $valueWorkedHours,
+            'norma_godzin' => $hoursStandard,
+            'wartosc_norm_godzinowych' => $valueStandard,
+            'nadgodziny' => $hoursOvertime,
+            'wartosc_nadgodzin' => $valueOvertime,
+        ], 200);
     }
 }

@@ -11,3 +11,4 @@ use App\Http\Controllers\WorktimeController;
 
 Route::post('/create-employeer', [EmployeeController::class, 'create']);
 Route::post('/register-worktime', [WorktimeController::class, 'register']);
+Route::post('/summary-worktime', [WorktimeController::class, 'summary']);

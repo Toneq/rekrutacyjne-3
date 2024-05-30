@@ -33,32 +33,41 @@ class WorktimeService
 
     public function hoursCalculation($worktime){
         $hours = 0;
+        $overtime = 0;
         foreach($worktime as $time){
             $startTime = Carbon::parse($time->data_rozpoczecia);
             $endTime = Carbon::parse($time->data_zakonczenia);
 
             $differenceTime = $startTime->diffInMinutes($endTime) / 60;
-            $differenceTime = $this->roundToNearestHalfHour($differenceTime);
+            $sumTime = $this->roundToNearestHalfHour($differenceTime);
 
-            $hours += $differenceTime;
+            $hours += $sumTime["hours"];
+            $overtime += $sumTime["overtime"];
         }
+
+        return ['hours' => $hours, 'overtime' => $overtime];
     }
 
     private function roundToNearestHalfHour($time){
         $hours = floor($time);
         $minutes = ($time - $hours) * 60;
-
-        if($minutes < 15){
+    
+        if ($minutes < 15) {
             $roundedMinutes = 0;
-        }
-        elseif($minutes >= 15 && $minutes < 45){
+        } elseif ($minutes >= 15 && $minutes < 45) {
             $roundedMinutes = 30;
-        }
-        else{
+        } else {
             $roundedMinutes = 0;
             $hours += 1;
         }
-
-        return $hours + ($roundedMinutes / 60);
+    
+        if ($hours > 8) {
+            $overtime = $hours - 8;
+            $hours = 8;
+            $overtime += $roundedMinutes / 60;
+            return ['hours' => $hours, 'overtime' => $overtime];
+        }
+    
+        return ['hours' => $hours + ($roundedMinutes / 60), 'overtime' => 0];
     }
 }
