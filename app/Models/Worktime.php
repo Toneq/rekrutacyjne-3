@@ -8,4 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 class Worktime extends Model
 {
     use HasFactory;
+
+    protected $fillable = ['employee_id', 'data_rozpoczecia', 'data_zakonczenia', 'dzien_rozpoczecia'];
 }

@@ -33,6 +33,11 @@ class WorktimeController extends Controller
 
         $employee = Employee::where('uuid', $request->uuid)->first();
 
+        $timeworkCheck = $this->worktimeService->checkTimework($employee->id, $request->data_rozpoczecia);
+        if ($timeworkCheck !== null && $timeworkCheck->getStatusCode() !== 200) {
+            return $timeworkCheck;
+        }
+
         $worktime = new Worktime();
         $worktime->employee_id = $employee->id;
         $worktime->data_rozpoczecia = $request->data_rozpoczecia;
