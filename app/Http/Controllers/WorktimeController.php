@@ -29,5 +29,16 @@ class WorktimeController extends Controller
         }
 
         $employee = Employee::where('uuid', $request->uuid)->first();
+
+        $worktime = new Worktime();
+        $worktime->employee_id = $employee->id;
+        $worktime->data_rozpoczecia = $request->data_rozpoczecia;
+        $worktime->data_zakonczenia = $request->data_zakonczenia;
+        $worktime->dzien_rozpoczecia = date('Y-m-d', strtotime($request->data_rozpoczecia));
+        if ($worktime->save()) {
+            return response()->json(['message' => 'Czas pracy został dodany!'], 201);
+        } else {
+            return response()->json(['error' => 'Wystąpił błąd podczas dodawania czasu pracy'], 500);
+        }
     }
 }
