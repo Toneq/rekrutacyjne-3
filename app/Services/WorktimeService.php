@@ -18,4 +18,16 @@ class WorktimeService
 
         return null;
     }
+
+    public function checkDifferenceTime($data_rozpoczecia, $data_zakonczenia){
+        $startTime = strtotime($data_rozpoczecia);
+        $endTime = strtotime($data_zakonczenia);
+        $differenceTime = ($endTime - $startTime) / 3600;
+
+        if($differenceTime > 12){
+            return response()->json(['error' => 'Przekroczono limit 12 godzin pracy w ciągu jednego dnia!'], 400);
+        }
+
+        return null;
+    }
 }

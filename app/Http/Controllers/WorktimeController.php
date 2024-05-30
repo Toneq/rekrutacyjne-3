@@ -38,6 +38,11 @@ class WorktimeController extends Controller
             return $timeworkCheck;
         }
 
+        $differenceTimeCheck = $this->worktimeService->checkDifferenceTime($request->data_rozpoczecia, $request->data_zakonczenia);
+        if ($differenceTimeCheck !== null && $differenceTimeCheck->getStatusCode() !== 200) {
+            return $differenceTimeCheck;
+        }
+
         $worktime = new Worktime();
         $worktime->employee_id = $employee->id;
         $worktime->data_rozpoczecia = $request->data_rozpoczecia;
